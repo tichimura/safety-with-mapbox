@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mapbox Maps for your Safety</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+<link href='https://api.mapbox.com/mapbox-assembly/v0.23.2/assembly.min.css' rel='stylesheet'>
+<script src='https://api.mapbox.com/mapbox-assembly/v0.23.2/assembly.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<link href="https://assets.website-files.com/5f291534dceb6cd8f0e7a02f/6019601de8e906e629493c4b_mapbox_favicon_32x32.png" rel="shortcut icon" type="image/x-icon"/>
+<style type="text/css">
+body { margin: 0; padding: 0; }
+
+#menu {
+  position: absolute;
+  background: #efefef;
+  padding: 10px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+#style {
+  position: absolute;
+  background: #efefef;
+  right: 10px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+#map { position: absolute; top: 0; bottom: 0; width: 100%; border-left: 1px solid #fff }
+
+    .mapboxgl-popup {
+      padding-bottom: 5px;
+    }
+
+    .mapboxgl-popup-close-button {
+      display: none;
+    }
+
+    .mapboxgl-popup-content {
+      font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+      padding: 0;
+      width: 250px;
+    }
+
+    .mapboxgl-popup-content-wrapper {
+      padding: 1%;
+    }
+
+    .mapboxgl-popup-content h3 {
+      background: rgb(61, 59, 59);
+      text-align: center;
+      color: #fff;
+      margin: 0;
+      display: block;
+      padding: 15px;
+      font-weight: 700;
+      margin-top: -5px;
+    }
+
+    .mapboxgl-popup-content h4 {
+      margin: 0;
+      display: block;
+      padding: 10px 3px 10px 10px;
+      font-weight: 400;
+    }
+
+    .mapboxgl-popup-content img{
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+
+    .mapboxgl-container {
+      cursor: pointer;
+    }
+
+    .mapboxgl-popup-anchor-top>.mapboxgl-popup-content {
+      margin-top: 3px;
+    }
+
+    .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+      border-bottom-color: rgb(61, 59, 59);
+    }
+</style>
+</head>
+
+<body>
+    <div class="toggle" id="map"></div>
+
+    <div class="toggle" id="menu">
+
+        <input id="kozui" type="checkbox" name="rtoggle" value="kozui">
+        <!-- See a list of Mapbox-hosted public styles at https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
+        <label for="kozui">洪水</label>
+
+        <input id="gake" type="checkbox" name="rtoggle" value="gake">
+        <label for="gake">がけ崩れ等</label>
+                
+        <input id="sio" type="checkbox" name="rtoggle" value="sio">
+        <label for="sio">高潮</label>        
+        <input id="jishin" type="checkbox" name="rtoggle" value="jishin">
+        <label for="jishin">地震</label><br>
+        
+        <input id="tsunami" type="checkbox" name="rtoggle" value="tsunami">
+        <label for="tsunami">津波</label>        
+        <input id="kaji" type="checkbox" name="rtoggle" value="kaji">
+        <label for="kaji">火事</label>
+        
+        <input id="hanran" type="checkbox" name="rtoggle" value="hanran">
+        <label for="hanran">内水氾濫</label>
+        <input id="kazan" type="checkbox" name="rtoggle" value="kazan">
+        <label for="kazan">火山現象</label>
+    </div>
+    
+    <div class="toggle" id="style">
+        <input id="satellite" type="radio" name="rtoggle" value="satellite"/>
+        <label for="satellite">3D+衛星</label><br>
+        <input id="streets" type="radio" name="rtoggle" value="streets" checked="checked"/>
+        <label for="streets">地図</label>
+    </div>
+        
+    <div class='absolute fl bottom my24 mx24 py24 px24 bg-gray-faint round'>
+        <form id='params'>
+            <h4 class='txt-m txt-bold mb6'>移動手段:</h4>
+            <div class='mb12 mr12 toggle-group align-center'>
+            <label class='toggle-container'>
+                <input name='profile' type='radio' value='walking' checked>
+                <div class='toggle toggle--active-null toggle--null'>徒歩</div>
+            </label>
+            <label class='toggle-container'>
+                <input name='profile' type='radio' value='cycling'>
+                <div class='toggle toggle--active-null toggle--null'>自転車</div>
+            </label>
+            </div>
+            <h4 class='txt-m txt-bold mb6'>所要時間（概算）:</h4>
+            <div class='mb12 mr12 toggle-group align-center'>
+            <label class='toggle-container'>
+                <input name='duration' type='radio' value='10' checked>
+                <div class='toggle toggle--active-null toggle--null'>10 min</div>
+            </label>
+            <label class='toggle-container'>
+                <input name='duration' type='radio' value='20'>
+                <div class='toggle toggle--active-null toggle--null'>20 min</div>
+            </label>
+            <label class='toggle-container'>
+                <input name='duration' type='radio' value='30'>
+                <div class='toggle toggle--active-null toggle--null'>30 min</div>
+            </label><br>
+            </div>
+        </form>
+        <!-- <h4 class='toggle txt-s mb6'>所要時間、+10分、+20分の想定移動範囲</h4> -->
+        <font size="1pt">所要時間、+10分、+20分の想定移動範囲</font>
+
+        <div class="toggle" id="3dguide-box" style="display: none;">
+            <p>浸水想定凡例</p>            
+            <font color="#FFBA7A" style="text-align: center;">&#9607;</font>1m未満<br>
+            <font color="#FE662F">&#9607;</font> <font size="1pt"></font>1m以上5m未満</font><br>
+            <font color="#CC0E00">&#9607;</font> <font size="1pt"></font>5m以上10m未満</font><br>
+            <font color="#7A0000">&#9607;</font> <font size="1pt"></font>10m以上</font>
+        </div>
+</div>
+    
+
+<script>
+
+
+    var streetstyle = 'mapbox://styles/tichimura/ckm3oa0jk63gh17o7b14j7vt8';
+    var satellitestyle = 'mapbox://styles/tichimura/ckm4a890pbr9q17o1mn240y7c';
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3ZjLW9rdGEtbWFwYm94LXN0YWZmLWFjY2VzcyIsImEiOiJja21kYWtiMXIyamo4MnBqeHhvZmhvMHFjIn0.sormn2WnNbOfS3emWH6XkQ';
+
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: streetstyle + '/draft',
+        center: [139.73100, 35.66572],
+        zoom: 11.15,
+        localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif,'Arial Unicode MS Regular'",
+        customAttribution: '<a href="https://www.geospatial.jp/ckan/dataset/hinanbasho" target="_blank">国土地理院/AIGID 指定緊急避難場所データ</a> | <a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A40.html" target="_blank">国土交通省 国土数値情報</a>'
+
+    });
+
+    var layerList = document.getElementById('style');
+    var inputs = layerList.getElementsByTagName('input');
+    
+
+    // スタイルが増えたらここを編集する
+    function switchLayer(layer) {
+        var layerId = layer.target.id;
+        if(layerId === 'streets'){
+          map.setStyle(streetstyle +'/draft');
+          document.getElementById('3dguide-box').style.display = "none";          
+     
+        }else if(layerId === 'satellite'){         
+          map.setStyle(satellitestyle +'/draft');          
+          document.getElementById('3dguide-box').style.display = "block";          
+        }
+    }
+    
+    for (var i = 0; i < inputs.length; i++) {
+        inputs[i].onclick = switchLayer;
+    }
+
+
+    // // Create variables to use in getIso()
+    var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
+    var lon = 139.61124;
+    var lat = 35.64312;
+    var profile = 'walking';
+    var minutes = 10;
+
+    var menuList = document.getElementById('menu');
+    var inputs = menuList.getElementsByTagName('input');
+    
+    map.on('styledata', function() {
+      
+        if(map.getSource('iso') === undefined){
+      
+      
+        map.addSource('iso', {
+          type: 'geojson',
+          data: {
+            'type': 'FeatureCollection',
+            'features': []
+          }
+        });
+
+        map.addLayer({
+          'id': 'isoLayer',
+          'type': 'fill',
+          // Use "iso" as the data source for this layer
+          'source': 'iso',
+          'layout': {},
+          'paint': {
+            // The fill color for the layer is set to a light purple
+            'fill-color': '#5a3fc0',
+            'fill-opacity': 0.4
+          }
+        }, "points");               
+        }
+      
+    });
+
+    map.on('load', function () {
+        // Add a GeoJSON source containing place coordinates and information.
+
+      if(map.getSource('iso') === undefined){
+
+        map.addSource('iso', {
+          type: 'geojson',
+          data: {
+            'type': 'FeatureCollection',
+            'features': []
+          }
+        });
+
+        map.addLayer({
+          'id': 'isoLayer',
+          'type': 'fill',
+          // Use "iso" as the data source for this layer
+          'source': 'iso',
+          'layout': {},
+          'paint': {
+            // The fill color for the layer is set to a light purple
+            'fill-color': '#5a3fc0',
+            'fill-opacity': 0.4
+          }
+        }, "points");               
+
+      }
+      
+      
+        var params = document.getElementById('params');
+      
+        params.addEventListener('change', function(e) {
+            if (e.target.name === 'profile') {
+                profile = e.target.value;
+                // getIso();
+            } else if (e.target.name === 'duration') {
+                minutes = e.target.value;
+                // getIso();
+            }
+        });       
+      
+      
+        menuList.addEventListener('change', function (e) {
+
+          
+          if(e.target.checked){
+
+            if(map.getLayoutProperty('points','visibility') == 'none')　map.setLayoutProperty('points', 'visibility', 'visible');
+            
+            var filters = map.getFilter('points');
+            var newfilter = true           
+            
+            if(Array.isArray(filters)){
+              
+                filters.forEach(function(element) {
+                  if (element.includes(e.target.labels[0].textContent)){
+                    newfilter = false;
+                  } 
+                });
+              
+                if( newfilter == true){
+                  filters.push(["==",e.target.labels[0].textContent,"◎"]);
+                  map.setFilter('points', filters);
+                }
+                // console.log(filters);
+                }else{
+                  map.setFilter('points', ['all', ["==",e.target.labels[0].textContent,"◎"]]);
+                 // map.setFilter('points', ['all', ["==",e.target.labels[0].textContent,"◎"]]);
+              };
+                        
+          }else{
+            var filters_now = map.getFilter('points');
+            var filters_new = new Array();
+            filters_now.forEach(function(element) {
+              if (!element.includes(e.target.labels[0].textContent)){
+                    filters_new.push(element);
+                  } 
+            });
+            
+            if(filters_new.length > 1){
+              map.setFilter('points', filters_new);            
+            }else{
+              map.setLayoutProperty('points', 'visibility', 'none')
+              map.setFilter('points', null);
+            }
+                        
+          }
+
+        });              
+             
+      
+        map.on('click', 'points', function (e) {
+                    
+          var popup = new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+        //   .setHTML(`<h3>` + e.features[0].properties.指定緊急避難場所 + `</h3>`)
+          .setHTML(`<h3>` + e.features[0].properties.指定緊急避難場所 + `</h3>`+`<h4 style="text-align: center">` + e.features[0].properties.所在地 + `</h4>`)
+          .addTo(map);
+          lon = popup.getLngLat().lng;
+          lat = popup.getLngLat().lat;
+          getIso();
+                    
+        });
+      
+    });
+
+    function getIso() {
+
+      var query = urlBase + profile + '/' + lon + ',' + lat + '?contours_minutes=' + minutes + ',' + (parseInt(minutes,10) + 10) + ',' + (parseInt(minutes,10) + 20) + '&polygons=true&access_token=' + mapboxgl.accessToken;
+
+      console.log("getIso is called.");
+      
+      $.ajax({
+        method: 'GET',
+        url: query
+      }).done(function(data) {
+        map.getSource('iso').setData(data);
+      })
+    };  
+
+
+</script>
+
+</body>
+</html>
